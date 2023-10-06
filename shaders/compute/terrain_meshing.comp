@@ -1,0 +1,64 @@
+#version 450
+
+#include "../../common/common.inl"
+
+layout(push_constant) uniform TerrainComputePush {
+  ivec4 chunk_pos;
+  VkDeviceAddress pvoxels;
+  VkDeviceAddress pface_buffer;
+  VkDeviceAddress phost_draw_info;
+};
+
+#define TOP_FACE 0
+#define FRONT_FACE 1
+#define LEFT_FACE 2
+#define BACK_FACE 3
+#define RIGHT_FACE 4
+#define BOTTOM_FACE 5
+
+bool not_occluded(ivec3 pos, uint face_i) {
+  if( pos.x == 0 || pos.y == 0 || pos.z == 0 ||
+      pos.x == WORLD_CHUNK_NX-1 || pos.y == WORLD_CHUNK_NY-1 || pos.z == WORLD_CHUNK_NZ-1
+    ) {
+    return true;
+  }
+
+  switch(face_i) {
+    case TOP_FACE:
+      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x, pos.y + 1, pos.z))] == 0;
+      break;
+    case FRONT_FACE:
+      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x, pos.y - 1, pos.z))] == 0;
+      break;
+    case LEFT_FACE:
+      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x - 1, pos.yz))] == 0;
+      break;
+    case BACK_FACE:
+      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x, pos.y + 1, pos.z))] == 0;
+      break;
+    case RIGHT_FACE:
+      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x + 1, pos.yz))] == 0;
+      break;
+    case BOTTOM_FACE:
+      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x, pos.y - 1, pos.z))] == 0;
+      break;
+    default:
+      return true;
+  }
+
+}
+
+layout(local_size_x = CHUNK_MESHING_LOCAL_SIZE_NX, local_size_y = CHUNK_MESHING_LOCAL_SIZE_NY, local_size_z = CHUNK_MESHING_LOCAL_SIZE_NZ) in;
+void main() {
+  ivec3 voxel_pos = ivec3(gl_GlobalInvocationID) + chunk_pos.xyz*WORLD_CHUNK_SIZE;
+
+  if(VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(voxel_pos)] == VOXEL_AIR) return;
+
+  // reserve some space in the buffer for this invocation
+  //* The vertex calculation relies on the faces being consecutivee in memory;
+  uint index = atomicAdd(HostDrawInfo(phost_draw_info).face_count, 6);
+  // For each face of the voxel
+  for(uint face_i = 0; face_i < 6; face_i++) {
+    FaceBuffer(pface_buffer).faces[index+face_i] = Face(voxel_pos, face_i);
+  }
+}
