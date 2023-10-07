@@ -8,23 +8,13 @@
 #include "types.inl"
 #include "voxel_types.inl"
 
-STATIC INLINE int voxel_index_from_coords(int x, int y, int z) {
-  int index = x + y * WORLD_CHUNK_NX + z * WORLD_CHUNK_NX*WORLD_CHUNK_NY;
-  return index;
-}
-
 STATIC INLINE int voxel_index_from_coords(i32vec3 pos) {
   int index = pos.x + pos.y * WORLD_CHUNK_NX + pos.z * WORLD_CHUNK_NX*WORLD_CHUNK_NY;
   return index;
 }
 
-STATIC INLINE int chunk_index_from_coords(i32vec2 pos) {
-  int index = pos.x + pos.y * RENDER_DISTANCE;
-  return index;
-}
-
 STATIC INLINE int chunk_index_from_coords(i32vec3 pos) {
-  int index = pos.x + pos.y * RENDER_DISTANCE + pos.z * RENDER_DISTANCE*RENDER_DISTANCE;
+  int index = pos.x + pos.z * RENDER_DISTANCE + pos.y * RENDER_DISTANCE*RENDER_DISTANCE;
   return index;
 }
 
@@ -67,23 +57,7 @@ struct Vertex {
   f32vec4 normal;
 };
 
-struct VoxelFace {
-  Vertex vertices[6];
-};
-
-struct VoxelCube {
-  VoxelFace faces[6]; 
-};
-
-#define sizeof_vertex (sizeof(f32vec4)+sizeof(f32vec4))
-#define sizeof_voxel_face (sizeof_vertex*6)
-#define sizeof_voxel_cube (sizeof_voxel_face*6)
-
 #if !defined(__cplusplus)
-DEVICE_ADDRESS(VertexBuffer, 16) {
-  Vertex vertices[];
-};
-
 struct Face {
   i32vec3 position;
   uint index;
@@ -94,13 +68,30 @@ DEVICE_ADDRESS(FaceBuffer, 16) {
 };
 #endif
 
+DEVICE_ADDRESS(ChunkUpdate, 16) {
+  i32vec4 chunk_positions[MAX_CHUNK_UPDATES_PER_DISPATCH];
+};
+
+DEVICE_ADDRESS(ScratchVoxelBuffer, 16) {
+  u32 voxels[1];
+};
+
+DEVICE_ADDRESS(ScratchVoxelBufferPointers, 16) {
+  ScratchVoxelBuffer scratch_voxel_buffers[MAX_CHUNK_UPDATES_PER_DISPATCH];
+};
+
 DEVICE_ADDRESS(VoxelBuffer, 16) {
   u32 voxels[1];
 };
 
-DEVICE_ADDRESS(HostDrawInfo, 16) {
-  u32 face_count;
+DEVICE_ADDRESS(VoxelBufferPointers, 16) {
+  VoxelBuffer voxel_buffers[WORLD_NCHUNKS];
 };
 
-//DESCRIPTOR_ARRAY(0, 0, sampler2D, textures);
-//DESCRIPTOR_ARRAY(1, 0, sampler3D, animations);
+//********************************************/
+
+DEVICE_ADDRESS(ShaderInfo, 16) {
+  u32 chunk_updates;
+  u32 dispatch_iteration;
+  u32 face_count;
+};

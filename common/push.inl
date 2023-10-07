@@ -7,10 +7,9 @@
 //* Remember to update them in the shader!
 
 struct BasicPush {
-  VkDeviceAddress pcamera_matrices;
-  VkDeviceAddress pvertices;
-  VkDeviceAddress phost_draw_info;
-  VkDeviceAddress pfaces;
+  VkDeviceAddress camera_matrices;
+  VkDeviceAddress faces;
+  VkDeviceAddress shader_info;
   f32mat4 model_matrix;
   f32vec4 color;
 };
@@ -18,13 +17,13 @@ static_assert(sizeof(BasicPush) <= 128);
 
 
 struct TerrainComputePush {
-  i32vec4 chunk_pos;
-  VkDeviceAddress pvoxels;
-  VkDeviceAddress pface_buffer;
-  VkDeviceAddress phost_draw_info;
+  VkDeviceAddress chunk_updates;
+  VkDeviceAddress scratch_voxel_buffer_pointers;
+  VkDeviceAddress voxel_buffer_pointers;
+  VkDeviceAddress face_buffer;
+  VkDeviceAddress shader_info;
 };
 static_assert(sizeof(TerrainComputePush) <= 128);
-
 
 struct FullscreenPush {
   f32vec4 cam_pos; // w is iTime

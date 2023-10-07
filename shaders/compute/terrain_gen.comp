@@ -5,28 +5,30 @@
 #include "../shared/noise.glsl"
 
 layout(push_constant) uniform TerrainComputePush {
-  ivec4 chunk_pos;
-  VkDeviceAddress pvoxels;
-  VkDeviceAddress pface_buffer;
-  VkDeviceAddress phost_draw_info;
+  ChunkUpdate chunk_updates;
+  ScratchVoxelBufferPointers scratch_voxel_buffer_pointers;
+  VoxelBufferPointers voxel_buffer_pointers;
+  FaceBuffer face_buffer;
+  ShaderInfo shader_info;
 };
 
 layout(local_size_x = CHUNK_GENERATION_LOCAL_SIZE_NX, local_size_y = CHUNK_GENERATION_LOCAL_SIZE_NY, local_size_z = CHUNK_GENERATION_LOCAL_SIZE_NZ) in;
 void main() {
-  float frequency1 = 0.12;
+  ivec3 chunk_pos = chunk_updates.chunk_positions[gl_GlobalInvocationIndex/WORLD_CHUNK_NVOX].xyz;
+  int chunk_index = chunk_index_from_coords(chunk_pos);
 
-  ivec3 voxel_pos = ivec3(gl_GlobalInvocationID) + chunk_pos.xyz*WORLD_CHUNK_SIZE;
+  float frequency1 = 0.036;
 
-  float base =
-    simplex3D(
-      voxel_pos * frequency1
-    );
+  // global space
+  ivec3 voxel_pos = ivec3(gl_GlobalInvocationID) + chunk_pos*WORLD_CHUNK_SIZE;
+
+  float base = simplex3D( voxel_pos * frequency1 );
 
   float val = 0.0;
   // Squash factor.
   // Lower => less disturbance
   // Higher => more disturbance, i.e. more "3D Noise like"
-  val += base*6.0;
+  val += base*13.0;
 
   // Huh interesting. Just 6 and 12 sf with this gives terrain
   // kind of like that modded sky islands thing that could
@@ -35,14 +37,19 @@ void main() {
 
   // Continetalness
   // Low = off-shore, High = very inland
-  float cont_frequency = 0.920;
-  float continentalness =
-    simplex3D(
-      voxel_pos * cont_frequency
-    );
+  float cont_frequency = 0.420;
+  float continentalness = simplex3D( voxel_pos * cont_frequency );
   float mod_cont = continentalness > 0.0 ? pow(continentalness, 50.0) : 0.0;
 
   float surface_level = 48;
   bool cond = int(val+surface_level+mod_cont) > voxel_pos.y;
-  VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(voxel_pos)] = cond ? 1 : 0;
+  
+  voxel_buffer_pointers
+    .voxel_buffers[chunk_index]
+                                    // global space to local space
+    .voxels[voxel_index_from_coords( ivec3(gl_GlobalInvocationID) )]
+    
+    =
+
+    true ? 1 : 0;
 }

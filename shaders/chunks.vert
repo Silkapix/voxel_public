@@ -5,43 +5,43 @@
 //* VK_CULL_MODE_BACK_BIT
 //* VK_FRONT_FACE_COUNTER_CLOCKWISE
 Vertex cube_vertices[6*6] =
-{ // Top face
-  Vertex(vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)),
-  Vertex(vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)),
-  // Front Face
-  Vertex(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)),
-  Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)),
-  // Left face
-  Vertex(vec4(0.0f, 1.0f, 0.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)),
-  Vertex(vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)),
-  // Back face
+{
+  // Top
   Vertex(vec4(1.0f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 0.0f)),
   Vertex(vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 1.0f, 0.0f, 0.0f)),
-  // Right face
-  Vertex(vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 1.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)),
-  Vertex(vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 1.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)),
-  // Bottom face
+  // Front
   Vertex(vec4(0.0f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, -1.0f, 0.0f)), Vertex(vec4(1.0f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, -1.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, -1.0f, 0.0f)),
   Vertex(vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, -1.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, -1.0f, 0.0f)), Vertex(vec4(1.0f, 1.0f, 0.0f, 1.0f), vec4(0.0f, 0.0f, -1.0f, 0.0f)),
+  // Left
+  Vertex(vec4(0.0f, 1.0f, 0.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)),
+  Vertex(vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec4(-1.0f, 0.0f, 0.0f, 0.0f)),
+  // Back
+  Vertex(vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)),
+  Vertex(vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)), Vertex(vec4(0.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 1.0f, 0.0f)),
+  // Right
+  Vertex(vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 1.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)),
+  Vertex(vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 1.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.0f)),
+  // Bottom
+  Vertex(vec4(0.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)),
+  Vertex(vec4(1.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)), Vertex(vec4(0.0f, 0.0f, 1.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)), Vertex(vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(0.0f, -1.0f, 0.0f, 0.0f)),
 };
 
 layout(location = 0) out vec4 out_color;
 
 layout(push_constant) uniform Push {
-  VkDeviceAddress pcamera_matrices;
-  VkDeviceAddress pvertices;
-  VkDeviceAddress phost_draw_info;
-  VkDeviceAddress pfaces;
+  CameraMatrices camera_matrices;
+  FaceBuffer faces;
+  ShaderInfo shader_info;
   mat4 model_matrix;
   vec4 color;
 };
 
 void main() {
-  CameraMatrices matrices = CameraMatrices(pcamera_matrices);
+  CameraMatrices matrices = camera_matrices;
   uint i_div = gl_VertexIndex/6;
   uint i_mod = gl_VertexIndex%6;
-  ivec3 voxel_pos = FaceBuffer(pfaces).faces[i_div].position;
-  uint index = FaceBuffer(pfaces).faces[i_div].index;
+  ivec3 voxel_pos = faces.faces[i_div].position;
+  uint index = faces.faces[i_div].index;
 
   vec4 pos = vec4(cube_vertices[index*6 + i_mod].position.xyz, 1.0) + vec4(voxel_pos, 0.0);
 
@@ -58,40 +58,35 @@ void main() {
   //* Fragment shader input
   float light_intensity;
   switch(index) {
-    // Top
     case 0:
       light_intensity = 1.0;
       //color = vec3(1.0, 1.0, 1.0);
       break;
-    // Front
     case 1:
-      light_intensity = 0.8;
+      light_intensity = 0.7;
       //color = vec3(1.0, 0.0, 0.0);
       break;
-    // Left
     case 2:
-      light_intensity = 0.4;
+      light_intensity = 0.6;
       //color = vec3(0.0, 0.0, 1.0);
       break;
-    // Back
     case 3:
       light_intensity = 0.5;
       //color = vec3(0.0, 1.0, 0.0);
       break;
-    // Right
     case 4:
-      light_intensity = 0.65;
+      light_intensity = 0.8;
       //color = vec3(1.0, 0.0, 1.0);
       break;
-    // Bottom
     case 5:
       light_intensity = 0.3;
       //color = vec3(0.0, 0.0, 0.0);
       break;
     default:
-      light_intensity = 0.1;
+      light_intensity = 0.0;
       //color = vec3(1.0, 1.0, 0.0);
       break;
   };
+
   out_color = vec4(color.xyz * light_intensity, color.w);
 }

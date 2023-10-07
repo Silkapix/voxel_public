@@ -3,10 +3,11 @@
 #include "../../common/common.inl"
 
 layout(push_constant) uniform TerrainComputePush {
-  ivec4 chunk_pos;
-  VkDeviceAddress pvoxels;
-  VkDeviceAddress pface_buffer;
-  VkDeviceAddress phost_draw_info;
+  ChunkUpdate chunk_updates;
+  ScratchVoxelBufferPointers scratch_voxel_buffer_pointers;
+  VoxelBufferPointers voxel_buffer_pointers;
+  FaceBuffer face_buffer;
+  ShaderInfo shader_info;
 };
 
 #define TOP_FACE 0
@@ -16,49 +17,80 @@ layout(push_constant) uniform TerrainComputePush {
 #define RIGHT_FACE 4
 #define BOTTOM_FACE 5
 
-bool not_occluded(ivec3 pos, uint face_i) {
+bool not_occluded(ivec3 pos, uint face_i, uint chunk_i) {
   if( pos.x == 0 || pos.y == 0 || pos.z == 0 ||
       pos.x == WORLD_CHUNK_NX-1 || pos.y == WORLD_CHUNK_NY-1 || pos.z == WORLD_CHUNK_NZ-1
     ) {
-    return true;
+    return false;
   }
 
   switch(face_i) {
     case TOP_FACE:
-      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x, pos.y + 1, pos.z))] == 0;
+      return voxel_buffer_pointers.voxel_buffers[chunk_i].voxels[voxel_index_from_coords(ivec3(pos.x, pos.y + 1, pos.z))] == 0;
       break;
     case FRONT_FACE:
-      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x, pos.y - 1, pos.z))] == 0;
+      return voxel_buffer_pointers.voxel_buffers[chunk_i].voxels[voxel_index_from_coords(ivec3(pos.x, pos.y, pos.z - 1))] == 0;
       break;
     case LEFT_FACE:
-      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x - 1, pos.yz))] == 0;
+      return voxel_buffer_pointers.voxel_buffers[chunk_i].voxels[voxel_index_from_coords(ivec3(pos.x - 1, pos.yz))] == 0;
       break;
     case BACK_FACE:
-      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x, pos.y + 1, pos.z))] == 0;
+      return voxel_buffer_pointers.voxel_buffers[chunk_i].voxels[voxel_index_from_coords(ivec3(pos.x, pos.y, pos.z + 1))] == 0;
       break;
     case RIGHT_FACE:
-      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x + 1, pos.yz))] == 0;
+      return voxel_buffer_pointers.voxel_buffers[chunk_i].voxels[voxel_index_from_coords(ivec3(pos.x + 1, pos.yz))] == 0;
       break;
     case BOTTOM_FACE:
-      return VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(ivec3(pos.x, pos.y - 1, pos.z))] == 0;
+      return voxel_buffer_pointers.voxel_buffers[chunk_i].voxels[voxel_index_from_coords(ivec3(pos.x, pos.y - 1, pos.z))] == 0;
       break;
     default:
-      return true;
+      return false;
   }
 
 }
 
 layout(local_size_x = CHUNK_MESHING_LOCAL_SIZE_NX, local_size_y = CHUNK_MESHING_LOCAL_SIZE_NY, local_size_z = CHUNK_MESHING_LOCAL_SIZE_NZ) in;
 void main() {
-  ivec3 voxel_pos = ivec3(gl_GlobalInvocationID) + chunk_pos.xyz*WORLD_CHUNK_SIZE;
+  ivec3 chunk_pos = chunk_updates.chunk_positions[gl_GlobalInvocationIndex/WORLD_CHUNK_NVOX].xyz;
+  int chunk_index = chunk_index_from_coords(chunk_pos);
 
-  if(VoxelBuffer(pvoxels).voxels[voxel_index_from_coords(voxel_pos)] == VOXEL_AIR) return;
+  // global space
+  ivec3 voxel_pos = ivec3(gl_GlobalInvocationID) + chunk_pos*WORLD_CHUNK_SIZE;
 
-  // reserve some space in the buffer for this invocation
-  //* The vertex calculation relies on the faces being consecutivee in memory;
-  uint index = atomicAdd(HostDrawInfo(phost_draw_info).face_count, 6);
+  uint voxel = voxel_buffer_pointers
+                .voxel_buffers[chunk_index]
+                // local space
+                .voxels[ voxel_index_from_coords(ivec3(gl_GlobalInvocationID)) ];
+  //if(voxel == VOXEL_AIR) return;
+
   // For each face of the voxel
+  Face faces[6];
+  uint face_count = 0;
   for(uint face_i = 0; face_i < 6; face_i++) {
-    FaceBuffer(pface_buffer).faces[index+face_i] = Face(voxel_pos, face_i);
+    bool result = not_occluded(ivec3(gl_GlobalInvocationID), face_i, chunk_index);
+    if(true) {
+      faces[face_count++] = Face(voxel_pos, face_i);
+    }
+  }
+
+  uint subgroup_index = subgroupExclusiveAdd(face_count);
+
+  // Find out which active invocation has the highest ID
+  uint highestActiveID = subgroupBallotFindMSB(subgroupBallot(true));
+
+  uint global_index = 0;
+
+  // If we're the highest active ID
+  if (highestActiveID == gl_SubgroupInvocationID) {
+    // We need to carve out a slice for our faces (for the entire subgroup)
+    uint subgroup_size = subgroup_index + face_count;
+
+    global_index = atomicAdd(shader_info.face_count, subgroup_size);
+  }
+
+  global_index = subgroupMax(global_index);
+
+  for(int i = 0; i < face_count; i++) {
+    face_buffer.faces[global_index + subgroup_index + i] = faces[i];
   }
 }
